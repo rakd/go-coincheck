@@ -144,6 +144,7 @@ func (c *Client) makeReq(method, resource string, payload map[string]string, aut
 		errCh <- err
 		return
 	}
+	log.Printf("rawurl:%s", rawurl)
 
 	if authNeeded {
 		if len(c.apiKey) == 0 || len(c.apiSecret) == 0 {
