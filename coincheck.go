@@ -34,6 +34,11 @@ type Coincheck struct {
 	client *Client
 }
 
+// SetDebug represent a coincheck client
+func (b *Coincheck) SetDebug(d bool) {
+	b.client.debug = d
+}
+
 // GetBalance ..
 func (b *Coincheck) GetBalance() (res BalanceResponse, r []byte, err error) {
 	r, err = b.client.do("GET", fmt.Sprintf("accounts/balance"), nil, true)
