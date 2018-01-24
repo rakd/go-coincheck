@@ -21,3 +21,15 @@ func TestGetBalance(t *testing.T) {
 
 	return
 }
+
+func TestGetTicker(t *testing.T) {
+
+	api := New("wrong_key", "wrong_secret")
+	ret, body, err := api.GetTicker()
+	require.NoError(t, err, nil)
+	log.Printf("err:%v", err)
+	log.Printf("ret:%v", ret)
+	log.Printf("body:%s", string(body))
+
+	return
+}

@@ -62,3 +62,24 @@ func (b *Coincheck) GetBalance() (res BalanceResponse, r []byte, err error) {
 	// ok
 	return
 }
+
+// GetBalance ..
+func (b *Coincheck) GetTicker() (res TickerResponse, r []byte, err error) {
+	r, err = b.client.do("GET", fmt.Sprintf("ticker"), nil, false)
+	if err != nil {
+		return
+	}
+
+	if err = json.Unmarshal(r, &res); err != nil {
+		er := ErrorResponse{}
+		if err = json.Unmarshal(r, &er); err == nil {
+			err = fmt.Errorf("Error: success=%v, %s", er.Success, er.Error)
+			return
+		}
+		log.Printf("body=%s", string(r))
+		return
+	}
+
+	// ok
+	return
+}
