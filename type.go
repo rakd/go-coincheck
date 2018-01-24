@@ -103,7 +103,7 @@ type BalanceResponse struct {
 	XrpDebt  decimal.Decimal `json:"xrp_debt"`
 	ZecDebt  decimal.Decimal `json:"zec_debt"`
 	XemDebt  decimal.Decimal `json:"xem_debt"`
-	LtcDebt  decimal.Decimal `json:"btc_debt"`
+	LtcDebt  decimal.Decimal `json:"ltc_debt"`
 	DashDebt decimal.Decimal `json:"dash_debt"`
 	BchDebt  decimal.Decimal `json:"bch_debt"`
 
