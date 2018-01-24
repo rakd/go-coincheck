@@ -63,7 +63,7 @@ func (b *Coincheck) GetBalance() (res BalanceResponse, r []byte, err error) {
 	return
 }
 
-// GetBalance ..
+// GetTicker ..
 func (b *Coincheck) GetTicker() (res TickerResponse, r []byte, err error) {
 	r, err = b.client.do("GET", fmt.Sprintf("ticker"), nil, false)
 	if err != nil {
