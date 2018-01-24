@@ -41,23 +41,24 @@ func (b *Coincheck) SetDebug(d bool) {
 
 // GetBalance ..
 func (b *Coincheck) GetBalance() (res BalanceResponse, r []byte, err error) {
-	r, err = b.client.do("GET", fmt.Sprintf("accounts/balance"), nil, true)
-	if err != nil {
+	r, err = b.client.do("GET", fmt.Sprintf("accounts/balance"), nil, true, &res)
+
+	if err == nil {
 		return
 	}
 	//log.Printf("r:%s", string(r))
 	//log.Printf("body=%s", string(r))
 
-	if err = json.Unmarshal(r, &res); err != nil {
+	//if err = json.Unmarshal(r, &res); err != nil {
 
-		er := ErrorResponse{}
-		if err = json.Unmarshal(r, &er); err == nil {
-			err = fmt.Errorf("Error: success=%v, %s", er.Success, er.Error)
-			return
-		}
-		log.Printf("body=%s", string(r))
+	er := ErrorResponse{}
+	if err = json.Unmarshal(r, &er); err == nil {
+		err = fmt.Errorf("Error: success=%v, %s", er.Success, er.Error)
 		return
 	}
+	log.Printf("body=%s", string(r))
+	//return
+	//}
 
 	// ok
 	return
@@ -65,21 +66,21 @@ func (b *Coincheck) GetBalance() (res BalanceResponse, r []byte, err error) {
 
 // GetTicker ..
 func (b *Coincheck) GetTicker() (res TickerResponse, r []byte, err error) {
-	r, err = b.client.do("GET", fmt.Sprintf("ticker"), nil, false)
-	if err != nil {
+	r, err = b.client.do("GET", fmt.Sprintf("ticker"), nil, false, &res)
+	if err == nil {
 		return
 	}
 
-	if err = json.Unmarshal(r, &res); err != nil {
-		er := ErrorResponse{}
-		if err = json.Unmarshal(r, &er); err == nil {
-			err = fmt.Errorf("Error: success=%v, %s", er.Success, er.Error)
-			return
-		}
-		log.Printf("body=%s", string(r))
+	//if err = json.Unmarshal(r, &res); err != nil {
+	er := ErrorResponse{}
+	if err = json.Unmarshal(r, &er); err == nil {
+		err = fmt.Errorf("Error: success=%v, %s", er.Success, er.Error)
 		return
 	}
+	log.Printf("body=%s", string(r))
+	return
+	//}
 
 	// ok
-	return
+	//return
 }

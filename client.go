@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -117,6 +118,7 @@ func generateHmacSha256(text, key string) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
+/*
 func (c *Client) makeReq(method, resource string, payload map[string]string, authNeeded bool, respCh chan<- []byte, errCh chan<- error) {
 	body := []byte{}
 	connectTimer := time.NewTimer(c.httpTimeout)
@@ -200,7 +202,9 @@ func (c *Client) makeReq(method, resource string, payload map[string]string, aut
 	close(respCh)
 	close(errCh)
 }
+*/
 
+/*
 // do prepare and process HTTP request to COINCHECK API
 func (c *Client) do(method, resource string, payload map[string]string, authNeeded bool) (response []byte, err error) {
 
@@ -210,5 +214,68 @@ func (c *Client) do(method, resource string, payload map[string]string, authNeed
 	go c.makeReq(method, resource, payload, authNeeded, respCh, errCh)
 	response = <-respCh
 	err = <-errCh
+	return
+}
+*/
+// do prepare and process HTTP request to COINCHECK API
+func (c *Client) do(method, resource string, payload map[string]string, authNeeded bool, result interface{}) (resp []byte, err error) {
+	var rawurl string
+	if strings.HasPrefix(resource, "http") {
+		rawurl = resource
+	} else {
+		rawurl = fmt.Sprintf("%s/%s", APIBaseURL, resource)
+	}
+
+	nonce := fmt.Sprintf("%d", time.Now().Unix())
+	formValues := url.Values{}
+	for key, value := range payload {
+		formValues.Set(key, value)
+	}
+	formData := formValues.Encode()
+
+	req, err := http.NewRequest(
+		method,
+		rawurl,
+		strings.NewReader(formData),
+	)
+	if err != nil {
+		return
+	}
+
+	if authNeeded {
+		if len(c.apiKey) == 0 || len(c.apiSecret) == 0 {
+			err = errors.New("You need to set API Key and API Secret to call this method")
+			return
+		}
+		sig := generateHmacSha256(nonce+rawurl+formData, c.apiSecret)
+		req.Header.Add("ACCESS-KEY", c.apiKey)
+		req.Header.Add("ACCESS-NONCE", nonce)
+		req.Header.Add("ACCESS-SIGNATURE", sig)
+	}
+
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+
+	//timeout := time.Duration(t) * time.Second
+	client := &http.Client{
+	//Timeout: timeout,
+	}
+
+	res, err := client.Do(req)
+
+	if err != nil {
+		return
+	}
+
+	defer res.Body.Close()
+
+	resp, err = ioutil.ReadAll(res.Body)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(resp, &result)
+	if err != nil {
+		return
+	}
+
 	return
 }
